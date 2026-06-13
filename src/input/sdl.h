@@ -24,6 +24,8 @@ extern int sdl_gamepads;
 
 void sdlinput_init(char* mappings);
 int sdlinput_handle_event(SDL_Window* window, SDL_Event* event);
+void sdlinput_set_relative_mouse_mode(bool enabled);
+bool sdlinput_get_relative_mouse_mode();
 void sdlinput_rumble(unsigned short controller_id, unsigned short low_freq_motor, unsigned short high_freq_motor);
 void sdlinput_rumble_triggers(unsigned short controller_id, unsigned short left_trigger, unsigned short right_trigger);
 void sdlinput_set_motion_event_state(unsigned short controller_id, unsigned char motion_type, unsigned short report_rate_hz);

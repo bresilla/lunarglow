@@ -39,6 +39,9 @@ void sdl_init(int width, int height, bool fullscreen) {
   sdlCurrentFrame = sdlNextFrame = 0;
 
   SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "0");
+#ifdef SDL_HINT_MOUSE_AUTO_CAPTURE
+  SDL_SetHint(SDL_HINT_MOUSE_AUTO_CAPTURE, "0");
+#endif
 
   if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
     fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
@@ -51,6 +54,8 @@ void sdl_init(int width, int height, bool fullscreen) {
     fprintf(stderr, "SDL: could not create window - exiting\n");
     exit(1);
   }
+
+  SDL_SetWindowGrab(window, SDL_FALSE);
 
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (!renderer) {
@@ -75,6 +80,10 @@ void sdl_loop() {
   SDL_Event event;
 
   SDL_SetRelativeMouseMode(SDL_FALSE);
+  SDL_SetWindowGrab(window, SDL_FALSE);
+  SDL_CaptureMouse(SDL_FALSE);
+  SDL_ShowCursor(SDL_ENABLE);
+  sdlinput_set_relative_mouse_mode(false);
 
   while(!done && SDL_WaitEvent(&event)) {
     switch (sdlinput_handle_event(window, &event)) {
@@ -86,12 +95,18 @@ void sdl_loop() {
       SDL_SetWindowFullscreen(window, fullscreen_flags);
       break;
     case SDL_MOUSE_GRAB:
+      sdlinput_set_relative_mouse_mode(true);
+      SDL_SetRelativeMouseMode(SDL_FALSE);
+      SDL_SetWindowGrab(window, SDL_FALSE);
+      SDL_CaptureMouse(SDL_FALSE);
       SDL_ShowCursor(SDL_ENABLE);
-      SDL_SetRelativeMouseMode(SDL_TRUE);
       break;
     case SDL_MOUSE_UNGRAB:
+      sdlinput_set_relative_mouse_mode(false);
       SDL_SetRelativeMouseMode(SDL_FALSE);
-      SDL_ShowCursor(SDL_DISABLE);
+      SDL_SetWindowGrab(window, SDL_FALSE);
+      SDL_CaptureMouse(SDL_FALSE);
+      SDL_ShowCursor(SDL_ENABLE);
       break;
     default:
       if (event.type == SDL_QUIT)

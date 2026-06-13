@@ -66,11 +66,11 @@ if(AVCODEC_FOUND AND AVUTIL_FOUND)
 endif()
 
 SET(MOONLIGHT_COMMON_INCLUDE_DIR ./third_party/moonlight-common-c/src)
-SET(GAMESTREAM_INCLUDE_DIR ./libgamestream)
+SET(GAMESTREAM_INCLUDE_DIR ./src/gamestream)
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-add_subdirectory(libgamestream)
+add_subdirectory(src/gamestream)
 
 add_executable(lunarglow ${SRC_LIST})
 target_link_libraries(lunarglow m)
@@ -148,10 +148,8 @@ endif()
 configure_file("./src/configuration.h.in" "${PROJECT_BINARY_DIR}/configuration.h")
 
 set_property(TARGET lunarglow PROPERTY COMPILE_DEFINITIONS ${MOONLIGHT_DEFINITIONS})
-target_include_directories(lunarglow PRIVATE ${GAMESTREAM_INCLUDE_DIR} ${MOONLIGHT_COMMON_INCLUDE_DIR} ${OPUS_INCLUDE_DIRS} ${EVDEV_INCLUDE_DIRS} ${UDEV_INCLUDE_DIRS})
+target_include_directories(lunarglow PRIVATE ./src ${GAMESTREAM_INCLUDE_DIR} ${MOONLIGHT_COMMON_INCLUDE_DIR} ${OPUS_INCLUDE_DIRS} ${EVDEV_INCLUDE_DIRS} ${UDEV_INCLUDE_DIRS})
 target_link_libraries(lunarglow ${EVDEV_LIBRARIES} ${OPUS_LIBRARY} ${UDEV_LIBRARIES} ${CMAKE_DL_LIBS})
-
-add_subdirectory(docs)
 
 install(TARGETS lunarglow DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES ./third_party/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/lunarglow)

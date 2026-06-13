@@ -36,8 +36,8 @@
 
 #include <Limelight.h>
 
-#include <client.h>
-#include <discover.h>
+#include "gamestream/client.h"
+#include "gamestream/discover.h"
 
 #include <stdio.h>
 #include <stdlib.h>

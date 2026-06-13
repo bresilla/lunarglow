@@ -63,6 +63,11 @@ static int activeGamepadMask = 0;
 
 int sdl_gamepads = 0;
 
+static bool relative_mouse_mode;
+static bool relative_mouse_has_last;
+static int relative_mouse_last_x;
+static int relative_mouse_last_y;
+
 #define VK_0 0x30
 #define VK_A 0x41
 
@@ -446,15 +451,44 @@ void sdlinput_init(char* mappings) {
   }
 }
 
+void sdlinput_set_relative_mouse_mode(bool enabled) {
+  relative_mouse_mode = enabled;
+  relative_mouse_has_last = false;
+}
+
+bool sdlinput_get_relative_mouse_mode() {
+  return relative_mouse_mode;
+}
+
+static bool mouse_position_in_window(SDL_Window* window, int x, int y) {
+  int w, h;
+  SDL_GetWindowSize(window, &w, &h);
+  return x >= 0 && y >= 0 && x < w && y < h;
+}
+
 int sdlinput_handle_event(SDL_Window* window, SDL_Event* event) {
   int button = 0;
   unsigned char touchEventType;
   PGAMEPAD_STATE gamepad;
   switch (event->type) {
+  case SDL_WINDOWEVENT:
+    if (event->window.event == SDL_WINDOWEVENT_ENTER || event->window.event == SDL_WINDOWEVENT_LEAVE)
+      relative_mouse_has_last = false;
+    break;
   case SDL_MOUSEMOTION:
-    if (SDL_GetRelativeMouseMode())
-      LiSendMouseMoveEvent(event->motion.xrel, event->motion.yrel);
-    else {
+    if (!mouse_position_in_window(window, event->motion.x, event->motion.y)) {
+      relative_mouse_has_last = false;
+      break;
+    }
+
+    if (relative_mouse_mode) {
+      if (relative_mouse_has_last)
+        LiSendMouseMoveEvent(event->motion.x - relative_mouse_last_x, event->motion.y - relative_mouse_last_y);
+
+      relative_mouse_last_x = event->motion.x;
+      relative_mouse_last_y = event->motion.y;
+      relative_mouse_has_last = true;
+    } else {
       int w, h;
       SDL_GetWindowSize(window, &w, &h);
       LiSendMousePositionEvent(event->motion.x, event->motion.y, w, h);
@@ -471,6 +505,9 @@ int sdlinput_handle_event(SDL_Window* window, SDL_Event* event) {
     break;
   case SDL_MOUSEBUTTONUP:
   case SDL_MOUSEBUTTONDOWN:
+    if (!mouse_position_in_window(window, event->button.x, event->button.y))
+      break;
+
     switch (event->button.button) {
     case SDL_BUTTON_LEFT:
       button = BUTTON_LEFT;
@@ -519,7 +556,7 @@ int sdlinput_handle_event(SDL_Window* window, SDL_Event* event) {
     else if ((modifiers & ACTION_MODIFIERS) == ACTION_MODIFIERS && event->key.keysym.sym == FULLSCREEN_KEY && event->type==SDL_KEYUP)
       return SDL_TOGGLE_FULLSCREEN;
     else if ((modifiers & ACTION_MODIFIERS) == ACTION_MODIFIERS && event->key.keysym.sym == UNGRAB_KEY && event->type==SDL_KEYUP)
-      return SDL_GetRelativeMouseMode() ? SDL_MOUSE_UNGRAB : SDL_MOUSE_GRAB;
+      return sdlinput_get_relative_mouse_mode() ? SDL_MOUSE_UNGRAB : SDL_MOUSE_GRAB;
     break;
   case SDL_FINGERDOWN:
   case SDL_FINGERMOTION:
