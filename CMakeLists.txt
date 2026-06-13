@@ -16,6 +16,11 @@ set(MOONLIGHT_DEFINITIONS)
 
 find_package(ALSA)
 find_package(Opus REQUIRED)
+find_package(LibUUID REQUIRED)
+find_package(Threads REQUIRED)
+find_package(CURL REQUIRED)
+find_package(OpenSSL 1.1.0 REQUIRED)
+find_package(EXPAT REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
@@ -26,6 +31,7 @@ option(ENABLE_PULSE "Compile PulseAudio support" ON)
 
 pkg_check_modules(EVDEV REQUIRED libevdev)
 pkg_check_modules(UDEV REQUIRED libudev)
+pkg_check_modules(AVAHI REQUIRED avahi-client)
 if (ENABLE_SDL)
   pkg_check_modules(SDL sdl2>=2.0.4)
 endif()
@@ -67,14 +73,18 @@ endif()
 
 SET(MOONLIGHT_COMMON_INCLUDE_DIR ./third_party/moonlight-common-c/src)
 SET(GAMESTREAM_INCLUDE_DIR ./src/gamestream)
+SET(H264_INCLUDE_DIR ./src/h264)
+
+aux_source_directory(./src/gamestream GAMESTREAM_SRC_LIST)
+aux_source_directory(./src/h264 GAMESTREAM_SRC_LIST)
+aux_source_directory(./third_party/moonlight-common-c/enet MOONLIGHT_COMMON_SRC_LIST)
+aux_source_directory(./third_party/moonlight-common-c/src MOONLIGHT_COMMON_SRC_LIST)
+aux_source_directory(./third_party/moonlight-common-c/reedsolomon MOONLIGHT_COMMON_SRC_LIST)
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-add_subdirectory(src/gamestream)
-
-add_executable(lunarglow ${SRC_LIST})
+add_executable(lunarglow ${SRC_LIST} ${GAMESTREAM_SRC_LIST} ${MOONLIGHT_COMMON_SRC_LIST})
 target_link_libraries(lunarglow m)
-target_link_libraries(lunarglow gamestream)
 
 if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   set(ALSA_FOUND FALSE)
@@ -148,8 +158,31 @@ endif()
 configure_file("./src/configuration.h.in" "${PROJECT_BINARY_DIR}/configuration.h")
 
 set_property(TARGET lunarglow PROPERTY COMPILE_DEFINITIONS ${MOONLIGHT_DEFINITIONS})
-target_include_directories(lunarglow PRIVATE ./src ${GAMESTREAM_INCLUDE_DIR} ${MOONLIGHT_COMMON_INCLUDE_DIR} ${OPUS_INCLUDE_DIRS} ${EVDEV_INCLUDE_DIRS} ${UDEV_INCLUDE_DIRS})
-target_link_libraries(lunarglow ${EVDEV_LIBRARIES} ${OPUS_LIBRARY} ${UDEV_LIBRARIES} ${CMAKE_DL_LIBS})
+target_include_directories(lunarglow PRIVATE
+  ./src
+  ${GAMESTREAM_INCLUDE_DIR}
+  ${H264_INCLUDE_DIR}
+  ${MOONLIGHT_COMMON_INCLUDE_DIR}
+  ./third_party/moonlight-common-c/reedsolomon
+  ./third_party/moonlight-common-c/enet/include
+  ${OPUS_INCLUDE_DIRS}
+  ${EVDEV_INCLUDE_DIRS}
+  ${UDEV_INCLUDE_DIRS}
+  ${AVAHI_INCLUDE_DIRS}
+  ${LibUUID_INCLUDE_DIRS}
+)
+target_link_libraries(lunarglow
+  ${EVDEV_LIBRARIES}
+  ${OPUS_LIBRARY}
+  ${UDEV_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
+  ${EXPAT_LIBRARIES}
+  ${AVAHI_LIBRARIES}
+  ${LibUUID_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${CMAKE_DL_LIBS}
+)
 
 install(TARGETS lunarglow DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES ./third_party/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/lunarglow)
