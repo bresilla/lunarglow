@@ -1,5 +1,5 @@
 /*
- * This file is part of Moonlight Embedded.
+ * This file is part of Lunarglow.
  *
  * Based on Moonlight Pc implementation
  *

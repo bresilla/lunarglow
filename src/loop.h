@@ -1,5 +1,5 @@
 /*
- * This file is part of Moonlight Embedded.
+ * This file is part of Lunarglow.
  *
  * Copyright (C) 2015-2019 Iwan Timmer
  *

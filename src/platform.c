@@ -1,5 +1,5 @@
 /*
- * This file is part of Moonlight Embedded.
+ * This file is part of Lunarglow.
  *
  * Copyright (C) 2015-2017 Iwan Timmer
  *
@@ -21,58 +21,13 @@
 
 #include "platform.h"
 
-#include "util.h"
-
 #include "audio/audio.h"
 #include "video/video.h"
 
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <dlfcn.h>
-
-typedef bool(*ImxInit)();
 
 enum platform platform_check(char* name) {
   bool std = strcmp(name, "auto") == 0;
-  #ifdef HAVE_IMX
-  if (std || strcmp(name, "imx") == 0) {
-    void *handle = dlopen("liblunarglow-imx.so", RTLD_NOW | RTLD_GLOBAL);
-    ImxInit video_imx_init = (ImxInit) dlsym(RTLD_DEFAULT, "video_imx_init");
-    if (handle != NULL) {
-      if (video_imx_init())
-        return IMX;
-    }
-  }
-  #endif
-  #ifdef HAVE_PI
-  if (std || strcmp(name, "pi") == 0) {
-    void *handle = dlopen("liblunarglow-pi.so", RTLD_NOW | RTLD_GLOBAL);
-    if (handle != NULL && dlsym(RTLD_DEFAULT, "bcm_host_init") != NULL)
-      return PI;
-  }
-  #endif
-  #ifdef HAVE_MMAL
-  if (std || strcmp(name, "mmal") == 0) {
-    void *handle = dlopen("liblunarglow-mmal.so", RTLD_NOW | RTLD_GLOBAL);
-    if (handle != NULL && dlsym(RTLD_DEFAULT, "bcm_host_init") != NULL)
-      return MMAL;
-  }
-  #endif
-  #ifdef HAVE_AML
-  if (std || strcmp(name, "aml") == 0) {
-    void *handle = dlopen("liblunarglow-aml.so", RTLD_LAZY | RTLD_GLOBAL);
-    if (handle != NULL && access("/dev/amvideo", F_OK) != -1)
-      return AML;
-  }
-  #endif
-  #ifdef HAVE_ROCKCHIP
-  if (std || strcmp(name, "rk") == 0) {
-    void *handle = dlopen("liblunarglow-rk.so", RTLD_NOW | RTLD_GLOBAL);
-    if (handle != NULL && dlsym(RTLD_DEFAULT, "mpp_init") != NULL)
-      return RK;
-  }
-  #endif
   #ifdef HAVE_X11
   bool x11 = strcmp(name, "x11") == 0;
   bool vdpau = strcmp(name, "x11_vdpau") == 0;
@@ -106,36 +61,9 @@ enum platform platform_check(char* name) {
 }
 
 void platform_start(enum platform system) {
-  switch (system) {
-  #ifdef HAVE_AML
-  case AML:
-    write_bool("/sys/class/graphics/fb0/blank", true);
-    write_bool("/sys/class/graphics/fb1/blank", true);
-    write_bool("/sys/class/video/disable_video", false);
-    break;
-  #endif
-  #if defined(HAVE_PI) || defined(HAVE_MMAL)
-  case PI:
-    write_bool("/sys/class/graphics/fb0/blank", true);
-    break;
-  #endif
-  }
 }
 
 void platform_stop(enum platform system) {
-  switch (system) {
-  #ifdef HAVE_AML
-  case AML:
-    write_bool("/sys/class/graphics/fb0/blank", false);
-    write_bool("/sys/class/graphics/fb1/blank", false);
-    break;
-  #endif
-  #if defined(HAVE_PI) || defined(HAVE_MMAL)
-  case PI:
-    write_bool("/sys/class/graphics/fb0/blank", false);
-    break;
-  #endif
-  }
 }
 
 DECODER_RENDERER_CALLBACKS* platform_get_video(enum platform system) {
@@ -156,26 +84,6 @@ DECODER_RENDERER_CALLBACKS* platform_get_video(enum platform system) {
   case SDL:
     return &decoder_callbacks_sdl;
   #endif
-  #ifdef HAVE_IMX
-  case IMX:
-    return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_imx");
-  #endif
-  #ifdef HAVE_PI
-  case PI:
-    return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_pi");
-  #endif
-  #ifdef HAVE_MMAL
-  case MMAL:
-    return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_mmal");
-  #endif
-  #ifdef HAVE_AML
-  case AML:
-    return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_aml");
-  #endif
-  #ifdef HAVE_ROCKCHIP
-  case RK:
-    return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_rk");
-  #endif
   }
   return NULL;
 }
@@ -187,12 +95,6 @@ AUDIO_RENDERER_CALLBACKS* platform_get_audio(enum platform system, char* audio_d
   #ifdef HAVE_SDL
   case SDL:
     return &audio_callbacks_sdl;
-  #endif
-  #ifdef HAVE_PI
-  case PI:
-    if (audio_device == NULL || strcmp(audio_device, "local") == 0 || strcmp(audio_device, "hdmi") == 0)
-      return (PAUDIO_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "audio_callbacks_omx");
-    // fall-through
   #endif
   default:
     #ifdef HAVE_PULSE
@@ -216,8 +118,6 @@ bool platform_prefers_codec(enum platform system, enum codecs codec) {
     return true;
   case CODEC_HEVC:
     switch (system) {
-    case AML:
-    case RK:
     case X11_VAAPI:
     case X11_VDPAU:
       return true;
@@ -231,16 +131,6 @@ bool platform_prefers_codec(enum platform system, enum codecs codec) {
 
 char* platform_name(enum platform system) {
   switch(system) {
-  case PI:
-    return "Raspberry Pi (Broadcom)";
-  case MMAL:
-    return "Raspberry Pi (Broadcom) MMAL";
-  case IMX:
-    return "i.MX6 (MXC Vivante)";
-  case AML:
-    return "AMLogic VPU";
-  case RK:
-    return "Rockchip VPU";
   case X11:
     return "X Window System (software decoding)";
   case X11_VAAPI:

@@ -138,7 +138,7 @@ By default the gamecontrollerdb.txt provided by Lunarglow is used.
 =item B<-platform> [I<PLATFORM>]
 
 Select platform for audio and video output and input.
-<PLATFORM> can be pi, imx, aml, x11, x11_vdpau, sdl or fake.
+<PLATFORM> can be x11, x11_vdpau, x11_vaapi, sdl or fake.
 
 =item B<-nounsupported>
 
@@ -173,7 +173,7 @@ Only evdev devices /dev/input/event* are supported.
 =item B<-audio> [I<DEVICE>]
 
 Use <DEVICE> as audio output device.
-The default value is 'sysdefault' for ALSA and 'hdmi' for OMX on the Raspberry Pi.
+The default value is 'sysdefault' for ALSA.
 
 =item B<-windowed>
 

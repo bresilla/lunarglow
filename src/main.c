@@ -1,5 +1,5 @@
 /*
- * This file is part of Moonlight Embedded.
+ * This file is part of Lunarglow.
  *
  * Copyright (C) 2015-2019 Iwan Timmer
  *
@@ -30,9 +30,6 @@
 #include "input/mapping.h"
 #include "input/evdev.h"
 #include "input/udev.h"
-#ifdef HAVE_LIBCEC
-#include "input/cec.h"
-#endif
 #ifdef HAVE_SDL
 #include "input/sdl.h"
 #endif
@@ -139,13 +136,13 @@ static void stream(PSERVER_DATA server, PCONFIGURATION config, enum platform sys
     connection_debug = true;
   }
 
-  if (IS_EMBEDDED(system))
+  if (USES_EVDEV_INPUT(system))
     loop_init();
 
   platform_start(system);
   LiStartConnection(&server->serverInfo, &config->stream, &connection_callbacks, platform_get_video(system), platform_get_audio(system, config->audio_device), NULL, drFlags, config->audio_device, 0);
 
-  if (IS_EMBEDDED(system)) {
+  if (USES_EVDEV_INPUT(system)) {
     if (!config->viewonly)
       evdev_start();
     loop_main();
@@ -195,9 +192,7 @@ static void help() {
   printf("\t-4k\t\t\tUse 3840x2160 resolution\n");
   printf("\t-width <width>\t\tHorizontal resolution (default 1280)\n");
   printf("\t-height <height>\tVertical resolution (default 720)\n");
-  #ifdef HAVE_EMBEDDED
   printf("\t-rotate <angle>\tRotate display: 0/90/180/270 (default 0)\n");
-  #endif
   printf("\t-fps <fps>\t\tSpecify the fps to use (default 60)\n");
   printf("\t-bitrate <bitrate>\tSpecify the bitrate in Kbps\n");
   printf("\t-packetsize <size>\tSpecify the maximum packetsize in bytes\n");
@@ -210,7 +205,7 @@ static void help() {
   printf("\t-surround <5.1/7.1>\t\tStream 5.1 or 7.1 surround sound\n");
   printf("\t-keydir <directory>\tLoad encryption keys from directory\n");
   printf("\t-mapping <file>\t\tUse <file> as gamepad mappings configuration file\n");
-  printf("\t-platform <system>\tSpecify system used for audio, video and input: pi/imx/aml/rk/x11/x11_vdpau/sdl/fake (default auto)\n");
+  printf("\t-platform <system>\tSpecify system used for audio, video and input: x11/x11_vdpau/x11_vaapi/sdl/fake (default auto)\n");
   printf("\t-nounsupported\t\tDon't stream if resolution is not officially supported by the server\n");
   printf("\t-quitappafter\t\tSend quit app request to remote after quitting session\n");
   printf("\t-viewonly\t\tDisable all input processing (view-only mode)\n");
@@ -219,11 +214,9 @@ static void help() {
   printf("\n WM options (SDL and X11 only)\n\n");
   printf("\t-windowed\t\tDisplay screen in a window\n");
   #endif
-  #ifdef HAVE_EMBEDDED
-  printf("\n I/O options (Not for SDL)\n\n");
+  printf("\n I/O options (evdev platforms only)\n\n");
   printf("\t-input <device>\t\tUse <device> as input. Can be used multiple times\n");
   printf("\t-audio <device>\t\tUse <device> as audio output device\n");
-  #endif
   printf("\nUse Ctrl+Alt+Shift+Q or Play+Back+LeftShoulder+RightShoulder to exit streaming session\n\n");
   exit(0);
 }
@@ -345,7 +338,7 @@ int main(int argc, char* argv[]) {
       if (config.debug_level > 0)
         printf("View-only mode enabled, no input will be sent to the host computer\n");
     } else {
-      if (IS_EMBEDDED(system)) {
+      if (USES_EVDEV_INPUT(system)) {
         char* mapping_env = getenv("SDL_GAMECONTROLLERCONFIG");
         if (config.mapping == NULL && mapping_env == NULL) {
           fprintf(stderr, "Please specify mapping file as default mapping could not be found.\n");
@@ -372,9 +365,6 @@ int main(int argc, char* argv[]) {
         udev_init(!inputAdded, mappings, config.debug_level > 0, config.rotate);
         evdev_init(config.mouse_emulation);
         rumble_handler = evdev_rumble;
-        #ifdef HAVE_LIBCEC
-        cec_init();
-        #endif /* HAVE_LIBCEC */
       }
       #ifdef HAVE_SDL
       else if (system == SDL) {

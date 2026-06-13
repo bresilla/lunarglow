@@ -1,5 +1,5 @@
 /*
- * This file is part of Moonlight Embedded.
+ * This file is part of Lunarglow.
  *
  * Copyright (C) 2015-2017 Iwan Timmer
  *
@@ -19,14 +19,13 @@
 
 #include <Limelight.h>
 
-#include <dlfcn.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#define IS_EMBEDDED(SYSTEM) SYSTEM != SDL
+#define USES_EVDEV_INPUT(SYSTEM) SYSTEM != SDL
 
-enum platform { NONE, SDL, X11, X11_VDPAU, X11_VAAPI, PI, MMAL, IMX, AML, RK, FAKE };
+enum platform { NONE, SDL, X11, X11_VDPAU, X11_VAAPI, FAKE };
 enum codecs { CODEC_UNSPECIFIED, CODEC_H264, CODEC_HEVC, CODEC_AV1 };
 
 enum platform platform_check(char*);
