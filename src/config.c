@@ -33,7 +33,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 
-#define MOONLIGHT_PATH "/moonlight"
+#define LUNARGLOW_PATH "/lunarglow"
 #define USER_PATHS "."
 #define DEFAULT_CONFIG_DIR "/.config"
 #define DEFAULT_CACHE_DIR "/.cache"
@@ -101,7 +101,7 @@ char* get_path(char* name, char* extra_data_dirs) {
   char *data_dirs = malloc(strlen(USER_PATHS) + 1 + strlen(xdg_config_dir) + 1 + strlen(home_dir) + 1 + strlen(DEFAULT_CONFIG_DIR) + 1 + strlen(extra_data_dirs) + 2);
   sprintf(data_dirs, USER_PATHS ":%s:%s/" DEFAULT_CONFIG_DIR ":%s/", xdg_config_dir, home_dir, extra_data_dirs);
 
-  char *path = malloc(strlen(data_dirs)+strlen(MOONLIGHT_PATH)+strlen(name)+2);
+  char *path = malloc(strlen(data_dirs)+strlen(LUNARGLOW_PATH)+strlen(name)+2);
   if (path == NULL) {
     fprintf(stderr, "Not enough memory\n");
     exit(-1);
@@ -114,7 +114,7 @@ char* get_path(char* name, char* extra_data_dirs) {
     int length = end != NULL ? end - data_dir:strlen(data_dir);
     memcpy(path, data_dir, length);
     if (path[0] == '/')
-      sprintf(path+length, MOONLIGHT_PATH "/%s", name);
+      sprintf(path+length, LUNARGLOW_PATH "/%s", name);
     else
       sprintf(path+length, "/%s", name);
 
@@ -372,7 +372,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   config->audio_device = NULL;
   config->sops = true;
   config->localaudio = false;
-  config->fullscreen = true;
+  config->fullscreen = false;
   config->unsupported = true;
   config->quitappafter = false;
   config->viewonly = false;
@@ -387,7 +387,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   config->mapping = get_path("gamecontrollerdb.txt", getenv("XDG_DATA_DIRS"));
   config->key_dir[0] = 0;
 
-  char* config_file = get_path("moonlight.conf", "/etc");
+  char* config_file = get_path("lunarglow.conf", "/etc");
   if (config_file)
     config_file_parse(config_file, config);
 
@@ -411,11 +411,11 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
     struct passwd *pw = getpwuid(getuid());
     const char *dir;
     if ((dir = getenv("XDG_CACHE_DIR")) != NULL)
-      snprintf(config->key_dir, sizeof(config->key_dir), "%s" MOONLIGHT_PATH, dir);
+      snprintf(config->key_dir, sizeof(config->key_dir), "%s" LUNARGLOW_PATH, dir);
     else if ((dir = getenv("HOME")) != NULL)
-      snprintf(config->key_dir, sizeof(config->key_dir), "%s" DEFAULT_CACHE_DIR MOONLIGHT_PATH, dir);
+      snprintf(config->key_dir, sizeof(config->key_dir), "%s" DEFAULT_CACHE_DIR LUNARGLOW_PATH, dir);
     else
-      snprintf(config->key_dir, sizeof(config->key_dir), "%s" DEFAULT_CACHE_DIR MOONLIGHT_PATH, pw->pw_dir);
+      snprintf(config->key_dir, sizeof(config->key_dir), "%s" DEFAULT_CACHE_DIR LUNARGLOW_PATH, pw->pw_dir);
   }
 
   if (config->stream.bitrate == -1) {

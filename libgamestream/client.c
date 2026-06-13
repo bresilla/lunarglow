@@ -290,10 +290,10 @@ static int load_server_status(PSERVER_DATA server) {
 
   if (ret == GS_OK && !server->unsupported) {
     if (server->serverMajorVersion > MAX_SUPPORTED_GFE_VERSION) {
-      gs_error = "Ensure you're running the latest version of Moonlight Embedded or downgrade GeForce Experience and try again";
+      gs_error = "Ensure you're running the latest version of Lunarglow or downgrade GeForce Experience and try again";
       ret = GS_UNSUPPORTED_VERSION;
     } else if (server->serverMajorVersion < MIN_SUPPORTED_GFE_VERSION) {
-      gs_error = "Moonlight Embedded requires a newer version of GeForce Experience. Please upgrade GFE on your PC and try again.";
+      gs_error = "Lunarglow requires a newer version of GeForce Experience. Please upgrade GFE on your PC and try again.";
       ret = GS_UNSUPPORTED_VERSION;
     }
   }

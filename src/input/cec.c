@@ -77,7 +77,7 @@ void cec_init() {
   g_config.bActivateSource = 0;
   g_callbacks.keyPress = &on_cec_keypress;
   g_config.callbacks = &g_callbacks;
-  snprintf(g_config.strDeviceName, sizeof(g_config.strDeviceName), "Moonlight");
+  snprintf(g_config.strDeviceName, sizeof(g_config.strDeviceName), "Lunarglow");
   g_config.callbacks = &g_callbacks;
   g_config.deviceTypes.types[0] = CEC_DEVICE_TYPE_PLAYBACK_DEVICE;
 

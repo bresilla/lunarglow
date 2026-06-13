@@ -1,11 +1,11 @@
 =head1 NAME
 
-Moonlight Embedded - Open source implementation of NVIDIA's GameStream
+Lunarglow - Open source implementation of NVIDIA's GameStream
 
 =head1 SYNOPSIS
 
-Usage: I<moonlight> E<lt>actionE<gt> [options] [host] [-port E<lt>numberE<gt>]
-       I<moonlight> E<lt>configfileE<gt>
+Usage: I<lunarglow> E<lt>actionE<gt> [options] [host] [-port E<lt>numberE<gt>]
+       I<lunarglow> E<lt>configfileE<gt>
 
 =head1 ACTIONS
 
@@ -127,13 +127,13 @@ Enable surround sound instead of stereo.
 =item B<-keydir> [I<DIRECTORY>]
 
 Change the directory to save encryption keys to I<DIRECTORY>.
-By default the encryption keys are stored in $XDG_CACHE_DIR/moonlight or ~/.cache/moonlight
+By default the encryption keys are stored in $XDG_CACHE_DIR/lunarglow or ~/.cache/lunarglow
 
 =item B<-mapping> [I<MAPPING>]
 
 Use I<MAPPING> as the mapping file for all inputs.
 This mapping file should have the same format as the gamecontrollerdb.txt for SDL2.
-By default the gamecontrollerdb.txt provided by Moonlight Embedded is used.
+By default the gamecontrollerdb.txt provided by Lunarglow is used.
 
 =item B<-platform> [I<PLATFORM>]
 
@@ -184,15 +184,15 @@ Only available when X11 or SDL platform is used.
 
 =head1 CONFIG FILE
 
-Moonlight Embedded will load a confiuration file from:
+Lunarglow will load a configuration file from:
 
-  $XDG_CONFIG_HOME/moonligt/moonlight.conf (fallback to ~/.config/moonligt/moonlight.conf)
+  $XDG_CONFIG_HOME/lunarglow/lunarglow.conf (fallback to ~/.config/lunarglow/lunarglow.conf)
 
 If no user specified configuration file is available the configuration will be loaded from:
 
-  /etc/moonlight/moonlight.conf
+  /etc/lunarglow/lunarglow.conf
 
-A documented example configuration file can be found at /etc/moonlight/moonlight.conf.
+A documented example configuration file can be found at /etc/lunarglow/lunarglow.conf.
 
 =head1 COMMENTS
 

@@ -38,13 +38,15 @@ int sdlCurrentFrame, sdlNextFrame;
 void sdl_init(int width, int height, bool fullscreen) {
   sdlCurrentFrame = sdlNextFrame = 0;
 
+  SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "0");
+
   if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
     fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
     exit(1);
   }
 
   fullscreen_flags = fullscreen?SDL_WINDOW_FULLSCREEN:0;
-  window = SDL_CreateWindow("Moonlight", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | fullscreen_flags);
+  window = SDL_CreateWindow("Lunarglow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | fullscreen_flags);
   if(!window) {
     fprintf(stderr, "SDL: could not create window - exiting\n");
     exit(1);
@@ -72,7 +74,7 @@ void sdl_init(int width, int height, bool fullscreen) {
 void sdl_loop() {
   SDL_Event event;
 
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+  SDL_SetRelativeMouseMode(SDL_FALSE);
 
   while(!done && SDL_WaitEvent(&event)) {
     switch (sdlinput_handle_event(window, &event)) {

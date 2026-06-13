@@ -170,12 +170,12 @@ static void stream(PSERVER_DATA server, PCONFIGURATION config, enum platform sys
 
 static void help() {
   #ifdef GIT_BRANCH
-  printf("Moonlight Embedded %d.%d.%d-%s-%s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
+  printf("Lunarglow %d.%d.%d-%s-%s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
   #else
-  printf("Moonlight Embedded %d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+  printf("Lunarglow %d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
   #endif
-  printf("Usage: moonlight [action] (options) [host] [-port <number>]\n");
-  printf("       moonlight [configfile]\n");
+  printf("Usage: lunarglow [action] (options) [host] [-port <number>]\n");
+  printf("       lunarglow [configfile]\n");
   printf("\n Actions\n\n");
   printf("\tpair\t\t\tPair device with computer\n");
   printf("\tunpair\t\t\tUnpair device with computer\n");
@@ -243,7 +243,7 @@ int main(int argc, char* argv[]) {
     help();
 
   if (config.debug_level > 0)
-    printf("Moonlight Embedded %d.%d.%d (%s)\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, COMPILE_OPTIONS);
+    printf("Lunarglow %d.%d.%d (%s)\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, COMPILE_OPTIONS);
 
   if (strcmp("map", config.action) == 0) {
     if (config.inputsCount != 1) {

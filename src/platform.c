@@ -37,7 +37,7 @@ enum platform platform_check(char* name) {
   bool std = strcmp(name, "auto") == 0;
   #ifdef HAVE_IMX
   if (std || strcmp(name, "imx") == 0) {
-    void *handle = dlopen("libmoonlight-imx.so", RTLD_NOW | RTLD_GLOBAL);
+    void *handle = dlopen("liblunarglow-imx.so", RTLD_NOW | RTLD_GLOBAL);
     ImxInit video_imx_init = (ImxInit) dlsym(RTLD_DEFAULT, "video_imx_init");
     if (handle != NULL) {
       if (video_imx_init())
@@ -47,28 +47,28 @@ enum platform platform_check(char* name) {
   #endif
   #ifdef HAVE_PI
   if (std || strcmp(name, "pi") == 0) {
-    void *handle = dlopen("libmoonlight-pi.so", RTLD_NOW | RTLD_GLOBAL);
+    void *handle = dlopen("liblunarglow-pi.so", RTLD_NOW | RTLD_GLOBAL);
     if (handle != NULL && dlsym(RTLD_DEFAULT, "bcm_host_init") != NULL)
       return PI;
   }
   #endif
   #ifdef HAVE_MMAL
   if (std || strcmp(name, "mmal") == 0) {
-    void *handle = dlopen("libmoonlight-mmal.so", RTLD_NOW | RTLD_GLOBAL);
+    void *handle = dlopen("liblunarglow-mmal.so", RTLD_NOW | RTLD_GLOBAL);
     if (handle != NULL && dlsym(RTLD_DEFAULT, "bcm_host_init") != NULL)
       return MMAL;
   }
   #endif
   #ifdef HAVE_AML
   if (std || strcmp(name, "aml") == 0) {
-    void *handle = dlopen("libmoonlight-aml.so", RTLD_LAZY | RTLD_GLOBAL);
+    void *handle = dlopen("liblunarglow-aml.so", RTLD_LAZY | RTLD_GLOBAL);
     if (handle != NULL && access("/dev/amvideo", F_OK) != -1)
       return AML;
   }
   #endif
   #ifdef HAVE_ROCKCHIP
   if (std || strcmp(name, "rk") == 0) {
-    void *handle = dlopen("libmoonlight-rk.so", RTLD_NOW | RTLD_GLOBAL);
+    void *handle = dlopen("liblunarglow-rk.so", RTLD_NOW | RTLD_GLOBAL);
     if (handle != NULL && dlsym(RTLD_DEFAULT, "mpp_init") != NULL)
       return RK;
   }

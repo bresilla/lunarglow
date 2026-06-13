@@ -103,7 +103,7 @@ int x11_setup(int videoFormat, int width, int height, int redrawRate, void* cont
   XSetWindowAttributes winattr = { .event_mask = PointerMotionMask | ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask };
   window = XCreateWindow(display, root, 0, 0, display_width, display_height, 0, CopyFromParent, InputOutput, CopyFromParent, CWEventMask, &winattr);
   XMapWindow(display, window);
-  XStoreName(display, window, "Moonlight");
+  XStoreName(display, window, "Lunarglow");
 
   if (drFlags & DISPLAY_FULLSCREEN) {
     Atom wm_state = XInternAtom(display, "_NET_WM_STATE", False);
